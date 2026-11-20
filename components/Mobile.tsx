@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { motion, useDragControls } from "motion/react";
-import { CONTRASTS, Contrast, EntranceScheme, FONTS, Item, KIND_SPEC, NavTab, PALETTES, Palette, SHAPES, ShapeScale, Theme, defaultTabsFor, iconSlotsOf, setIconSlot } from "@/lib/tokens";
+import { CONTRASTS, Contrast, ENTRANCES, EntranceScheme, FONTS, Item, KIND_SPEC, NavTab, PALETTES, Palette, SHAPES, ShapeScale, Theme, defaultTabsFor, iconSlotsOf, setIconSlot } from "@/lib/tokens";
 import { ensureFontLoaded } from "@/lib/theme";
-import { KIND_TEXT, LANGS, Lang, t, useLang } from "@/lib/i18n";
+import { KIND_TEXT, LANGS, Lang, UIKey, t, useLang } from "@/lib/i18n";
 import { IconPicker } from "./IconPicker";
 import { Icon } from "./M3Node";
 import { VariantSwatch, variantsOf } from "./Inspector";
 import { Field, IconBtn, Segmented, Toggle } from "./ui";
+
+/** one entrance recipe, one button: the label each of them carries */
+const MOBILE_ENTRANCE_KEY: Record<EntranceScheme, UIKey> = {
+  off: "entranceOff",
+  soft: "entranceSoft",
+  tip: "entranceTip",
+  modal: "entranceModal",
+  slide: "entranceSlide",
+};
 
 /** Sheet that slides up from the bottom edge; the canvas above stays usable.
  *  Dragging the handle moves the sheet with the finger; a flick or a long pull closes it. */
@@ -510,17 +519,36 @@ export function MobileSettings({
         />
       </Row>
       <Row icon="blur_on" label={t("entrance", lang)} p={p}>
-        <Segmented<EntranceScheme>
-          options={[
-            { key: "off", label: t("entranceOff", lang) },
-            { key: "soft", label: t("entranceSoft", lang) },
-            { key: "deep", label: t("entranceDeep", lang) },
-          ]}
-          value={theme.entrance}
-          onChange={(entrance) => onTheme({ entrance })}
-          p={p}
-          height={44}
-        />
+        {/* one tappable button per BoardUI recipe, three across, so each effect stands on its own
+            instead of being a notch on a single blur-in */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+          {ENTRANCES.map((e) => {
+            const on = theme.entrance === e.key;
+            return (
+              <button
+                key={e.key}
+                onClick={() => onTheme({ entrance: e.key })}
+                aria-pressed={on}
+                className="m3-press"
+                style={{
+                  height: 44,
+                  borderRadius: 12,
+                  border: "none",
+                  background: on ? p.secondaryContainer : p.surfaceContainerLow,
+                  color: on ? p.onSecondaryContainer : p.onSurface,
+                  outline: on ? `2px solid ${p.primary}` : "2px solid transparent",
+                  outlineOffset: 1,
+                  fontSize: 13,
+                  fontWeight: on ? 700 : 500,
+                  cursor: "pointer",
+                  padding: 0,
+                }}
+              >
+                {t(MOBILE_ENTRANCE_KEY[e.key], lang)}
+              </button>
+            );
+          })}
+        </div>
       </Row>
     </div>
   );

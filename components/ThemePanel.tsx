@@ -2,11 +2,58 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ENTRANCES, FONTS, Palette, SHAPES, ShapeScale, Theme, entranceCssVars } from "@/lib/tokens";
+import { ENTRANCES, EntranceScheme, FONTS, Palette, SHAPES, ShapeScale, Theme, entranceCssVars } from "@/lib/tokens";
 import { ensureFontLoaded } from "@/lib/theme";
-import { Lang, t, useLang } from "@/lib/i18n";
+import { Lang, UIKey, t, useLang } from "@/lib/i18n";
 import { Icon } from "./M3Node";
 import { Toggle } from "./ui";
+
+/** each entrance recipe is its own button, so each needs its own name */
+const ENTRANCE_KEY: Record<EntranceScheme, UIKey> = {
+  off: "entranceOff",
+  soft: "entranceSoft",
+  tip: "entranceTip",
+  modal: "entranceModal",
+  slide: "entranceSlide",
+};
+
+/** The art for a recipe: a solid square where the part lands, a dashed outline where it starts
+ *  (bigger the harder it compresses, or displaced downward for the slide), so the five buttons
+ *  read differently at a glance even before they play. */
+function EntranceArt({ k, p }: { k: EntranceScheme; p: Palette }) {
+  const c = 28;
+  const ghost: Record<EntranceScheme, { s: number; dy: number }> = {
+    off: { s: 0, dy: 0 },
+    soft: { s: 18, dy: 0 },
+    tip: { s: 22, dy: 0 },
+    modal: { s: 26, dy: 0 },
+    slide: { s: 12, dy: 9 },
+  };
+  const g = ghost[k];
+  return (
+    <svg width="56" height="34" viewBox="0 0 56 34" aria-hidden>
+      <rect x={c - 6} y={17 - 6} width="12" height="12" rx="3.5" fill={p.primary} opacity="0.9" />
+      {g.s > 0 && (
+        <rect
+          x={c - g.s / 2}
+          y={17 - g.s / 2 + g.dy}
+          width={g.s}
+          height={g.s}
+          rx={4}
+          fill="none"
+          stroke={p.outline}
+          strokeDasharray="3 3"
+        />
+      )}
+      {k === "slide" && (
+        <g stroke={p.outline} strokeWidth="1.5" fill="none" strokeLinecap="round">
+          <path d={`M${c + 13} 29 L${c + 13} 15`} />
+          <path d={`M${c + 9} 19 L${c + 13} 15 L${c + 17} 19`} />
+        </g>
+      )}
+    </svg>
+  );
+}
 
 const shapeLabel = (k: ShapeScale, lang: Lang) => (k === "square" ? t("shapeSquare", lang) : k === "full" ? t("shapeFull", lang) : t("shapeRounded", lang));
 
@@ -176,36 +223,38 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
       <Hint p={p}>{t("motionHint", lang)}</Hint>
 
       <div style={{ fontSize: 12, fontWeight: 700, color: p.onSurfaceVariant, padding: "0 4px", marginTop: 4 }}>{t("entrance", lang)}</div>
-      <div style={{ display: "flex", gap: 6 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
         {ENTRANCES.map((e) => (
-          <OptionCard
+          <button
             key={e.key}
-            on={theme.entrance === e.key}
             onClick={() => {
               onChange({ entrance: e.key });
               setTick((n) => n + 1);
             }}
-            p={p}
-            label={e.key === "off" ? t("entranceOff", lang) : e.key === "deep" ? t("entranceDeep", lang) : t("entranceSoft", lang)}
+            aria-pressed={theme.entrance === e.key}
+            title={`${t(ENTRANCE_KEY[e.key], lang)} · ${e.ms ? `${e.ms}ms` : "—"}`}
+            className="m3-press"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 5,
+              padding: "9px 4px 7px",
+              borderRadius: 14,
+              border: "none",
+              background: theme.entrance === e.key ? p.secondaryContainer : p.surfaceContainerLow,
+              color: theme.entrance === e.key ? p.onSecondaryContainer : p.onSurface,
+              cursor: "pointer",
+              outline: theme.entrance === e.key ? `2px solid ${p.primary}` : "2px solid transparent",
+              outlineOffset: 1,
+            }}
           >
-            <svg width="64" height="36" viewBox="0 0 64 36" aria-hidden>
-              {/* the small solid square is the part where it lands; the dashed outline is the
-                  place it condenses from, which grows with the setting */}
-              <rect x="26" y="8" width="12" height="12" rx="3" fill={p.primary} opacity="0.85" />
-              {e.key !== "off" && (
-                <rect
-                  x={e.key === "deep" ? 14 : 20}
-                  y={e.key === "deep" ? 2 : 4}
-                  width={e.key === "deep" ? 36 : 24}
-                  height={e.key === "deep" ? 24 : 16}
-                  rx={e.key === "deep" ? 8 : 5}
-                  fill="none"
-                  stroke={p.outline}
-                  strokeDasharray="3 3"
-                />
-              )}
-            </svg>
-          </OptionCard>
+            <EntranceArt k={e.key} p={p} />
+            <span style={{ fontSize: 11, fontWeight: 600, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {t(ENTRANCE_KEY[e.key], lang)}
+            </span>
+            <span style={{ fontSize: 10, fontVariantNumeric: "tabular-nums", color: p.onSurfaceVariant }}>{e.ms ? `${e.ms}ms` : "—"}</span>
+          </button>
         ))}
       </div>
       <Hint p={p}>{t("entranceHint", lang)}</Hint>
@@ -232,9 +281,9 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
           key={`${theme.motion}:${theme.entrance}:${tick}`}
           initial={false}
           style={{
-            /* the same BoardUI blur-in the canvas parts arrive with, replayed on demand */
+            /* the same BoardUI entrance the canvas parts arrive with, replayed on demand */
             ...entranceCssVars(theme.entrance),
-            animation: "var(--m3e-in-name, m3e-soft-in) var(--m3e-in-dur, 150ms) cubic-bezier(0.22, 1, 0.36, 1)",
+            animation: "var(--m3e-in-name, m3e-in) var(--m3e-in-dur, 150ms) var(--m3e-in-ease, cubic-bezier(0.22, 1, 0.36, 1))",
             width: 48,
             height: 48,
             borderRadius: expressive ? 14 : 24,

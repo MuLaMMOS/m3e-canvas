@@ -127,18 +127,32 @@ export const PULL_EXP = 2.2;
 export const SETTLE_MS = 340;
 /** the same time and curve, as the CSS custom properties the stylesheet eases with */
 export const SETTLE_CSS_VARS = { "--m3-settle": `${SETTLE_MS}ms`, "--m3-ease": "cubic-bezier(0.2, 0, 0, 1)" } as const;
-/** how far the BoardUI blur-in compresses before a part lands. "soft" is the reference 150ms /
- *  scale .95 / 2px blur, "deep" takes its modal weight, and "off" turns the entrance off
- *  entirely (name "none" plus a zero duration, so nothing is left to interpolate).
+/** The entrance recipes, lifted number for number from BoardUI's motion reference. Each one is a
+ *  separate button in the motion panel, not a strength of a single blur-in:
+ *  "soft" is the popover blur-in (150ms, .95, 2px), "tip" the tooltip — a smaller element that
+ *  compresses deeper (200ms, .90, 4px), "modal" the dialog (300ms, .85, 4px, its own
+ *  cubic-bezier(0.32, 0.72, 0, 1)), "slide" the row that grows in from below (400ms, 12px,
+ *  no blur), and "off" removes the entrance outright — name "none" plus a zero duration, so
+ *  nothing is left to interpolate.
  *  Written as custom properties so one place sets it and the stylesheet reads it. */
+const ENTRANCE_SPECS: Record<EntranceScheme, { ms: number; blur: string; scale: string; dy: string; ease: string }> = {
+  off: { ms: 0, blur: "0px", scale: "1", dy: "0px", ease: "linear" },
+  soft: { ms: 150, blur: "2px", scale: "0.95", dy: "0px", ease: "cubic-bezier(0.22, 1, 0.36, 1)" },
+  tip: { ms: 200, blur: "4px", scale: "0.9", dy: "0px", ease: "cubic-bezier(0.22, 1, 0.36, 1)" },
+  modal: { ms: 300, blur: "4px", scale: "0.85", dy: "0px", ease: "cubic-bezier(0.32, 0.72, 0, 1)" },
+  slide: { ms: 400, blur: "0px", scale: "1", dy: "12px", ease: "cubic-bezier(0.22, 1, 0.36, 1)" },
+};
+
 export function entranceCssVars(entrance: EntranceScheme): CSSProperties {
-  if (entrance === "off") {
-    return { "--m3e-in-name": "none", "--m3e-in-dur": "0ms", "--m3e-in-blur": "0px", "--m3e-in-scale": "1" } as CSSProperties;
-  }
-  if (entrance === "deep") {
-    return { "--m3e-in-name": "m3e-soft-in", "--m3e-in-dur": "300ms", "--m3e-in-blur": "4px", "--m3e-in-scale": "0.86" } as CSSProperties;
-  }
-  return { "--m3e-in-name": "m3e-soft-in", "--m3e-in-dur": "150ms", "--m3e-in-blur": "2px", "--m3e-in-scale": "0.95" } as CSSProperties;
+  const s = ENTRANCE_SPECS[entrance] ?? ENTRANCE_SPECS.soft;
+  return {
+    "--m3e-in-name": entrance === "off" ? "none" : "m3e-in",
+    "--m3e-in-dur": `${s.ms}ms`,
+    "--m3e-in-blur": s.blur,
+    "--m3e-in-scale": s.scale,
+    "--m3e-in-dy": s.dy,
+    "--m3e-in-ease": s.ease,
+  } as CSSProperties;
 }
 /** the size handles stand above everything on the canvas but the panels */
 export const SIZE_HANDLE_Z = 55;
@@ -449,10 +463,9 @@ export const PALETTES: Palette[] = PRESETS.map((p) => ({ ...p, secondary: scheme
 export type ShapeScale = "square" | "rounded" | "full";
 export type FontKey = "roboto" | "robotoFlex" | "robotoSerif" | "system";
 export type MotionScheme = "standard" | "expressive";
-/** how a part arrives on the canvas, independent of the MotionScheme: the scheme shapes the
- *  curves and the prompt, this decides whether there is an entrance at all and how far it
- *  travels. BoardUI's blur-in is the reference for "soft"; "deep" is its modal weight. */
-export type EntranceScheme = "off" | "soft" | "deep";
+/** how a part arrives on the canvas: one BoardUI entrance recipe, chosen on its own axis and
+ *  independent of the MotionScheme. The motion panel gives each one its own button. */
+export type EntranceScheme = "off" | "soft" | "tip" | "modal" | "slide";
 export type { Contrast };
 
 export type Theme = {
@@ -483,7 +496,9 @@ export function normalizeTheme(t: Partial<Theme> | undefined): Theme {
     font: FONTS.some((c) => c.key === t.font) ? (t.font as FontKey) : d.font,
     emphasized: typeof t.emphasized === "boolean" ? t.emphasized : d.emphasized,
     motion: t.motion === "expressive" || t.motion === "standard" ? t.motion : d.motion,
-    entrance: t.entrance === "off" || t.entrance === "deep" || t.entrance === "soft" ? t.entrance : d.entrance,
+    /* sketches saved while the entrance was a three-step ladder keep their weight: "deep" was
+       the modal recipe, so it lands on "modal" instead of falling back to the default */
+    entrance: (t.entrance as string) === "deep" ? "modal" : ENTRANCES.some((e) => e.key === t.entrance) ? (t.entrance as EntranceScheme) : d.entrance,
   };
 }
 
@@ -493,11 +508,14 @@ export const SHAPES: { key: ShapeScale; label: string; icon: string }[] = [
   { key: "full", label: "Full", icon: "circle" },
 ];
 
-/** the entrance options the motion panel offers, in the order it shows them */
-export const ENTRANCES: { key: EntranceScheme; label: string }[] = [
-  { key: "off", label: "Off" },
-  { key: "soft", label: "Soft" },
-  { key: "deep", label: "Deep" },
+/** the entrance buttons the motion panel offers, in the order it shows them. `ms` is the
+ *  duration each recipe runs at, printed under the name so the numbers stay honest. */
+export const ENTRANCES: { key: EntranceScheme; label: string; ms: number }[] = [
+  { key: "off", label: "None", ms: 0 },
+  { key: "soft", label: "Soft blur", ms: 150 },
+  { key: "tip", label: "Tooltip", ms: 200 },
+  { key: "modal", label: "Modal", ms: 300 },
+  { key: "slide", label: "Slide up", ms: 400 },
 ];
 
 export const FONTS: { key: FontKey; label: string; family: string; /** Google Fonts family to fetch, if any */ google?: string }[] = [

@@ -1969,13 +1969,14 @@ export function M3Node({
           instant || menu.snap
             ? "outline-color 120ms"
             : `outline-color 120ms, height ${SETTLE_MS}ms cubic-bezier(0.2, 0, 0, 1)${measured && !easeWidth ? "" : `, width ${SETTLE_MS}ms cubic-bezier(0.2, 0, 0, 1)`}`,
-        /* the part arrives the way BoardUI's panels do: it condenses into place rather than
-           sliding in. Kept off a dragged part (it is already under the finger) and off the
-           still rendering, so what is measured twice does not flicker. */
+        /* the part arrives with whichever BoardUI entrance the motion panel was set to: it
+           condenses into place rather than sliding in (unless the recipe is the slide).
+           Kept off a dragged part (it is already under the finger) and off the still
+           rendering, so what is measured twice does not flicker. */
         animation:
           reducedMotion || dragging || instant
             ? undefined
-            : "var(--m3e-in-name, m3e-soft-in) var(--m3e-in-dur, 150ms) var(--m3e-in-ease, cubic-bezier(0.22, 1, 0.36, 1))",
+            : "var(--m3e-in-name, m3e-in) var(--m3e-in-dur, 150ms) var(--m3e-in-ease, cubic-bezier(0.22, 1, 0.36, 1))",
         flex: "0 0 auto",
       }}
     >

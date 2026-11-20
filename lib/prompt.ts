@@ -1401,8 +1401,10 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     },
     entrance: {
       off: "登場アニメーションはなし。部品は最終位置にそのまま表示する。",
-      soft: "部品は 150ms でフェードインし、0.95 に縮小して 2px ぼかした状態から凝縮して定位置に収まる。ease-out で弾まない。",
-      deep: "部品は 300ms でフェードインし、0.86 に縮小して 4px ぼかした状態から凝縮して定位置に収まる。ease-out で弾まない。",
+      soft: "部品は 150ms でフェードインし、0.95 の縮小と 2px ぼかしから位置を動かさずに凝縮して収まる。ease-out で弾まない。",
+      tip: "部品は 200ms でフェードインし、0.90 の縮小と 4px ぼかしから凝縮して収まる。ツールチップ相当で、ポップオーバーより深く圧縮する。",
+      modal: "部品は 300ms、0.85 の縮小、4px ぼかし、cubic-bezier(0.32, 0.72, 0, 1) で展開して収まる。ダイアログの開き方。",
+      slide: "部品は 400ms かけて下 12px からフェードインしながら上がる。拡大縮小もぼかしも使わない。",
     },
   },
   en: {
@@ -1419,8 +1421,10 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     },
     entrance: {
       off: "No entrance animation: parts appear directly in their final position.",
-      soft: "Parts fade in over 150ms from scale 0.95 and a 2px blur, condensing into place on an ease-out curve with no bounce.",
-      deep: "Parts fade in over 300ms from scale 0.86 and a 4px blur, condensing into place on an ease-out curve with no bounce.",
+      soft: "Parts fade in over 150ms from scale 0.95 and a 2px blur, condensing into place on an ease-out curve with no travel.",
+      tip: "Parts fade in over 200ms from scale 0.90 and a 4px blur — the tooltip weight, compressing deeper than the popover.",
+      modal: "Parts open over 300ms from scale 0.85 and a 4px blur on cubic-bezier(0.32, 0.72, 0, 1), the way a dialog does.",
+      slide: "Parts rise over 400ms from 12px below, fading in without any scaling or blur.",
     },
   },
   zh: {
@@ -1437,8 +1441,10 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     },
     entrance: {
       off: "不做入场动画，组件直接出现在最终位置。",
-      soft: "组件以 150ms 淡入、0.95 的缩放和 2px 模糊凝聚到位，ease-out 曲线，不回弹。",
-      deep: "组件以 300ms 淡入、0.86 的缩放和 4px 模糊凝聚到位，ease-out 曲线，不回弹。",
+      soft: "组件以 150ms 淡入、0.95 的缩放和 2px 模糊原地凝聚到位，ease-out 曲线，不回弹也不位移。",
+      tip: "组件以 200ms 淡入、0.90 的缩放和 4px 模糊凝聚到位，相当于提示气泡的分量，比软模糊压得更深。",
+      modal: "组件以 300ms、0.85 的缩放、4px 模糊、cubic-bezier(0.32, 0.72, 0, 1) 展开到位，像对话框弹出。",
+      slide: "组件以 400ms 从下方 12px 处淡入升到位，不做缩放也不加模糊。",
     },
   },
   ko: {
@@ -1455,8 +1461,10 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     },
     entrance: {
       off: "등장 애니메이션 없이 부품이 최종 위치에 바로 표시된다.",
-      soft: "부품은 150ms 동안 0.95 배율과 2px 흐림에서 페이드인하며 제자리로 응축된다. ease-out, 튀지 않음.",
-      deep: "부품은 300ms 동안 0.86 배율과 4px 흐림에서 페이드인하며 제자리로 응축된다. ease-out, 튀지 않음.",
+      soft: "부품은 150ms 동안 0.95 배율과 2px 흐림에서 이동 없이 페이드인하며 제자리로 응축된다. ease-out, 튀지 않음.",
+      tip: "부품은 200ms 동안 0.90 배율과 4px 흐림에서 응축된다. 툴팁 무게로 팝오버보다 더 깊게 압축한다.",
+      modal: "부품은 300ms 동안 0.85 배율과 4px 흐림, cubic-bezier(0.32, 0.72, 0, 1)로 열려 자리 잡는다. 대화상자가 열리는 방식.",
+      slide: "부품은 400ms 동안 아래 12px에서 페이드인으로 올라온다. 확대와 흐림은 쓰지 않는다.",
     },
   },
 };
