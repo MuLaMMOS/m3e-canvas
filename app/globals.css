@@ -17,6 +17,35 @@ body {
   overscroll-behavior: none;
 }
 
+/* Soft blur-in, lifted from BoardUI's motion language: a part condenses into place from
+   a hair smaller, slightly transparent and barely out of focus. Nothing slides in from
+   a distance. The fill mode is left alone on purpose — once it lands, the animation
+   releases the properties back to the part's own transform (press scale, corner tweens). */
+@keyframes m3e-soft-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+/* motion is a setting, not a decoration: whoever asks their system to calm down gets a still canvas */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes m3e-soft-in {
+    from,
+    to {
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+  }
+}
+
 /* Material Symbols Rounded (variable font) */
 .msr {
   font-family: "Material Symbols Rounded";
