@@ -1969,6 +1969,13 @@ export function M3Node({
           instant || menu.snap
             ? "outline-color 120ms"
             : `outline-color 120ms, height ${SETTLE_MS}ms cubic-bezier(0.2, 0, 0, 1)${measured && !easeWidth ? "" : `, width ${SETTLE_MS}ms cubic-bezier(0.2, 0, 0, 1)`}`,
+        /* the part arrives the way BoardUI's panels do: it condenses into place rather than
+           sliding in. Kept off a dragged part (it is already under the finger) and off the
+           still rendering, so what is measured twice does not flicker. */
+        animation:
+          reducedMotion || dragging || instant
+            ? undefined
+            : "m3e-soft-in 150ms cubic-bezier(0.22, 1, 0.36, 1)",
         flex: "0 0 auto",
       }}
     >
