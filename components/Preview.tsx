@@ -1484,7 +1484,7 @@ export function Preview({
               overflow: "hidden",
               background: p[current.bg ?? "surface"],
               fontFamily: fontFamilyOf(theme.font, lang),
-              ...entranceCssVars(theme.motion),
+              ...entranceCssVars(theme.entrance),
               touchAction: "none",
             }}
           >

@@ -3893,7 +3893,7 @@ export default function Editor({ initialLang, onReady }: { initialLang: Lang; on
           /* the settle time and curve the stylesheet eases with, from the one place they are set */
           ...(SETTLE_CSS_VARS as React.CSSProperties),
           /* the entrance the parts condense in with, chosen by the motion scheme in the panel */
-          ...entranceCssVars(theme.motion),
+          ...entranceCssVars(theme.entrance),
           display: "flex",
           overflow: "hidden",
           background: p.surfaceContainer,

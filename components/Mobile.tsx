@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, useDragControls } from "motion/react";
-import { CONTRASTS, Contrast, FONTS, Item, KIND_SPEC, NavTab, PALETTES, Palette, SHAPES, ShapeScale, Theme, defaultTabsFor, iconSlotsOf, setIconSlot } from "@/lib/tokens";
+import { CONTRASTS, Contrast, EntranceScheme, FONTS, Item, KIND_SPEC, NavTab, PALETTES, Palette, SHAPES, ShapeScale, Theme, defaultTabsFor, iconSlotsOf, setIconSlot } from "@/lib/tokens";
 import { ensureFontLoaded } from "@/lib/theme";
 import { KIND_TEXT, LANGS, Lang, t, useLang } from "@/lib/i18n";
 import { IconPicker } from "./IconPicker";
@@ -505,6 +505,19 @@ export function MobileSettings({
           ]}
           value={theme.motion}
           onChange={(motion) => onTheme({ motion })}
+          p={p}
+          height={44}
+        />
+      </Row>
+      <Row icon="blur_on" label={t("entrance", lang)} p={p}>
+        <Segmented<EntranceScheme>
+          options={[
+            { key: "off", label: t("entranceOff", lang) },
+            { key: "soft", label: t("entranceSoft", lang) },
+            { key: "deep", label: t("entranceDeep", lang) },
+          ]}
+          value={theme.entrance}
+          onChange={(entrance) => onTheme({ entrance })}
           p={p}
           height={44}
         />

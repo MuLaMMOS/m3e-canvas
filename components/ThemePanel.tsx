@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { FONTS, Palette, SHAPES, ShapeScale, Theme, entranceCssVars } from "@/lib/tokens";
+import { ENTRANCES, FONTS, Palette, SHAPES, ShapeScale, Theme, entranceCssVars } from "@/lib/tokens";
 import { ensureFontLoaded } from "@/lib/theme";
 import { Lang, t, useLang } from "@/lib/i18n";
 import { Icon } from "./M3Node";
@@ -175,6 +175,41 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
       </div>
       <Hint p={p}>{t("motionHint", lang)}</Hint>
 
+      <div style={{ fontSize: 12, fontWeight: 700, color: p.onSurfaceVariant, padding: "0 4px", marginTop: 4 }}>{t("entrance", lang)}</div>
+      <div style={{ display: "flex", gap: 6 }}>
+        {ENTRANCES.map((e) => (
+          <OptionCard
+            key={e.key}
+            on={theme.entrance === e.key}
+            onClick={() => {
+              onChange({ entrance: e.key });
+              setTick((n) => n + 1);
+            }}
+            p={p}
+            label={e.key === "off" ? t("entranceOff", lang) : e.key === "deep" ? t("entranceDeep", lang) : t("entranceSoft", lang)}
+          >
+            <svg width="64" height="36" viewBox="0 0 64 36" aria-hidden>
+              {/* the small solid square is the part where it lands; the dashed outline is the
+                  place it condenses from, which grows with the setting */}
+              <rect x="26" y="8" width="12" height="12" rx="3" fill={p.primary} opacity="0.85" />
+              {e.key !== "off" && (
+                <rect
+                  x={e.key === "deep" ? 14 : 20}
+                  y={e.key === "deep" ? 2 : 4}
+                  width={e.key === "deep" ? 36 : 24}
+                  height={e.key === "deep" ? 24 : 16}
+                  rx={e.key === "deep" ? 8 : 5}
+                  fill="none"
+                  stroke={p.outline}
+                  strokeDasharray="3 3"
+                />
+              )}
+            </svg>
+          </OptionCard>
+        ))}
+      </div>
+      <Hint p={p}>{t("entranceHint", lang)}</Hint>
+
       <button
         onClick={() => setTick((n) => n + 1)}
         className="m3-press"
@@ -194,12 +229,12 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
         }}
       >
         <motion.span
-          key={`${theme.motion}:${tick}`}
+          key={`${theme.motion}:${theme.entrance}:${tick}`}
           initial={false}
           style={{
             /* the same BoardUI blur-in the canvas parts arrive with, replayed on demand */
-            ...entranceCssVars(theme.motion),
-            animation: "m3e-soft-in var(--m3e-in-dur, 150ms) cubic-bezier(0.22, 1, 0.36, 1)",
+            ...entranceCssVars(theme.entrance),
+            animation: "var(--m3e-in-name, m3e-soft-in) var(--m3e-in-dur, 150ms) cubic-bezier(0.22, 1, 0.36, 1)",
             width: 48,
             height: 48,
             borderRadius: expressive ? 14 : 24,

@@ -315,6 +315,7 @@ describe("normalizeTheme", () => {
       font: "roboto",
       emphasized: false,
       motion: "standard",
+      entrance: "soft",
     });
   });
 

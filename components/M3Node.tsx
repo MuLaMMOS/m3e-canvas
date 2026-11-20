@@ -1975,7 +1975,7 @@ export function M3Node({
         animation:
           reducedMotion || dragging || instant
             ? undefined
-            : "m3e-soft-in var(--m3e-in-dur, 150ms) var(--m3e-in-ease, cubic-bezier(0.22, 1, 0.36, 1))",
+            : "var(--m3e-in-name, m3e-soft-in) var(--m3e-in-dur, 150ms) var(--m3e-in-ease, cubic-bezier(0.22, 1, 0.36, 1))",
         flex: "0 0 auto",
       }}
     >

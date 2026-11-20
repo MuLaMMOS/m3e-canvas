@@ -127,16 +127,18 @@ export const PULL_EXP = 2.2;
 export const SETTLE_MS = 340;
 /** the same time and curve, as the CSS custom properties the stylesheet eases with */
 export const SETTLE_CSS_VARS = { "--m3-settle": `${SETTLE_MS}ms`, "--m3-ease": "cubic-bezier(0.2, 0, 0, 1)" } as const;
-/** how far the BoardUI blur-in compresses before a part lands: the standard scheme is the
- *  reference 150ms / scale .95 / 2px blur, the expressive one travels further and lingers a
- *  little, so switching the scheme in the motion panel is visible on the canvas, not only in
- *  the prompt. Written as custom properties so one place sets it and the stylesheet reads it. */
-export function entranceCssVars(motion: MotionScheme) {
-  return (
-    motion === "expressive"
-      ? { "--m3e-in-dur": "320ms", "--m3e-in-blur": "4px", "--m3e-in-scale": "0.86" }
-      : { "--m3e-in-dur": "150ms", "--m3e-in-blur": "2px", "--m3e-in-scale": "0.95" }
-  ) as CSSProperties;
+/** how far the BoardUI blur-in compresses before a part lands. "soft" is the reference 150ms /
+ *  scale .95 / 2px blur, "deep" takes its modal weight, and "off" turns the entrance off
+ *  entirely (name "none" plus a zero duration, so nothing is left to interpolate).
+ *  Written as custom properties so one place sets it and the stylesheet reads it. */
+export function entranceCssVars(entrance: EntranceScheme): CSSProperties {
+  if (entrance === "off") {
+    return { "--m3e-in-name": "none", "--m3e-in-dur": "0ms", "--m3e-in-blur": "0px", "--m3e-in-scale": "1" } as CSSProperties;
+  }
+  if (entrance === "deep") {
+    return { "--m3e-in-name": "m3e-soft-in", "--m3e-in-dur": "300ms", "--m3e-in-blur": "4px", "--m3e-in-scale": "0.86" } as CSSProperties;
+  }
+  return { "--m3e-in-name": "m3e-soft-in", "--m3e-in-dur": "150ms", "--m3e-in-blur": "2px", "--m3e-in-scale": "0.95" } as CSSProperties;
 }
 /** the size handles stand above everything on the canvas but the panels */
 export const SIZE_HANDLE_Z = 55;
@@ -447,6 +449,10 @@ export const PALETTES: Palette[] = PRESETS.map((p) => ({ ...p, secondary: scheme
 export type ShapeScale = "square" | "rounded" | "full";
 export type FontKey = "roboto" | "robotoFlex" | "robotoSerif" | "system";
 export type MotionScheme = "standard" | "expressive";
+/** how a part arrives on the canvas, independent of the MotionScheme: the scheme shapes the
+ *  curves and the prompt, this decides whether there is an entrance at all and how far it
+ *  travels. BoardUI's blur-in is the reference for "soft"; "deep" is its modal weight. */
+export type EntranceScheme = "off" | "soft" | "deep";
 export type { Contrast };
 
 export type Theme = {
@@ -459,9 +465,11 @@ export type Theme = {
   /** headings and labels take the heavier M3 Expressive "emphasized" styles */
   emphasized: boolean;
   motion: MotionScheme;
+  /** the entrance every part plays when it first lands on the canvas */
+  entrance: EntranceScheme;
 };
 
-export const DEFAULT_THEME: Theme = { dark: false, bothModes: false, contrast: "standard", shape: "rounded", font: "roboto", emphasized: false, motion: "standard" };
+export const DEFAULT_THEME: Theme = { dark: false, bothModes: false, contrast: "standard", shape: "rounded", font: "roboto", emphasized: false, motion: "standard", entrance: "soft" };
 
 /** a stored theme with any missing or unknown field replaced by its default */
 export function normalizeTheme(t: Partial<Theme> | undefined): Theme {
@@ -475,6 +483,7 @@ export function normalizeTheme(t: Partial<Theme> | undefined): Theme {
     font: FONTS.some((c) => c.key === t.font) ? (t.font as FontKey) : d.font,
     emphasized: typeof t.emphasized === "boolean" ? t.emphasized : d.emphasized,
     motion: t.motion === "expressive" || t.motion === "standard" ? t.motion : d.motion,
+    entrance: t.entrance === "off" || t.entrance === "deep" || t.entrance === "soft" ? t.entrance : d.entrance,
   };
 }
 
@@ -482,6 +491,13 @@ export const SHAPES: { key: ShapeScale; label: string; icon: string }[] = [
   { key: "square", label: "Square", icon: "crop_square" },
   { key: "rounded", label: "Rounded", icon: "rounded_corner" },
   { key: "full", label: "Full", icon: "circle" },
+];
+
+/** the entrance options the motion panel offers, in the order it shows them */
+export const ENTRANCES: { key: EntranceScheme; label: string }[] = [
+  { key: "off", label: "Off" },
+  { key: "soft", label: "Soft" },
+  { key: "deep", label: "Deep" },
 ];
 
 export const FONTS: { key: FontKey; label: string; family: string; /** Google Fonts family to fetch, if any */ google?: string }[] = [

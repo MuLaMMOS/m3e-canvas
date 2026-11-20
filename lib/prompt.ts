@@ -1386,7 +1386,7 @@ const FONT_NOTE: Record<Lang, (name: string) => string> = {
   ko: (n) => `사용할 글꼴: ${n}.`,
 };
 
-const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasized: string; plainType: string; motion: Record<Theme["motion"], string> }> = {
+const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasized: string; plainType: string; motion: Record<Theme["motion"], string>; entrance: Record<Theme["entrance"], string> }> = {
   ja: {
     shape: {
       square: "角丸は控えめにする: M3 の shape スケールを全体に小さく取り（ボタン・チップは 8〜12dp、カードや画像は 8dp、ダイアログは 12dp 程度）、ピル型は使わない。",
@@ -1398,6 +1398,11 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     motion: {
       standard: "モーションは MotionScheme.standard()。画面遷移や状態変化は弾まない滑らかな動きにする。",
       expressive: "モーションは MotionScheme.expressive()。画面遷移や状態変化には軽く弾むスプリングを使う。",
+    },
+    entrance: {
+      off: "登場アニメーションはなし。部品は最終位置にそのまま表示する。",
+      soft: "部品は 150ms でフェードインし、0.95 に縮小して 2px ぼかした状態から凝縮して定位置に収まる。ease-out で弾まない。",
+      deep: "部品は 300ms でフェードインし、0.86 に縮小して 4px ぼかした状態から凝縮して定位置に収まる。ease-out で弾まない。",
     },
   },
   en: {
@@ -1412,6 +1417,11 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
       standard: "Motion uses MotionScheme.standard(): smooth transitions and state changes with no bounce.",
       expressive: "Motion uses MotionScheme.expressive(): a light spring bounce on transitions and state changes.",
     },
+    entrance: {
+      off: "No entrance animation: parts appear directly in their final position.",
+      soft: "Parts fade in over 150ms from scale 0.95 and a 2px blur, condensing into place on an ease-out curve with no bounce.",
+      deep: "Parts fade in over 300ms from scale 0.86 and a 4px blur, condensing into place on an ease-out curve with no bounce.",
+    },
   },
   zh: {
     shape: {
@@ -1424,6 +1434,11 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
     motion: {
       standard: "动效使用 MotionScheme.standard()：屏幕过渡和状态变化平滑、不回弹。",
       expressive: "动效使用 MotionScheme.expressive()：屏幕过渡和状态变化带轻微回弹的弹簧效果。",
+    },
+    entrance: {
+      off: "不做入场动画，组件直接出现在最终位置。",
+      soft: "组件以 150ms 淡入、0.95 的缩放和 2px 模糊凝聚到位，ease-out 曲线，不回弹。",
+      deep: "组件以 300ms 淡入、0.86 的缩放和 4px 模糊凝聚到位，ease-out 曲线，不回弹。",
     },
   },
   ko: {
@@ -1438,6 +1453,11 @@ const THEME_NOTES: Record<Lang, { shape: Record<Theme["shape"], string>; emphasi
       standard: "모션은 MotionScheme.standard()를 사용한다. 화면 전환과 상태 변화는 튀지 않고 부드럽게 처리한다.",
       expressive: "모션은 MotionScheme.expressive()를 사용한다. 화면 전환과 상태 변화에 가볍게 튀는 스프링 효과를 적용한다.",
     },
+    entrance: {
+      off: "등장 애니메이션 없이 부품이 최종 위치에 바로 표시된다.",
+      soft: "부품은 150ms 동안 0.95 배율과 2px 흐림에서 페이드인하며 제자리로 응축된다. ease-out, 튀지 않음.",
+      deep: "부품은 300ms 동안 0.86 배율과 4px 흐림에서 페이드인하며 제자리로 응축된다. ease-out, 튀지 않음.",
+    },
   },
 };
 
@@ -1446,7 +1466,7 @@ function themeLines(th: Theme, lang: Lang): string[] {
   const font = FONTS.find((f) => f.key === th.font);
   const fontName = font?.key === "system" ? (lang === "ja" ? "端末のシステムフォント" : lang === "zh" ? "设备的系统字体" : lang === "ko" ? "기기의 시스템 글꼴" : "the device's system font") : (font?.label ?? "Roboto");
   const sp = lang === "en" || lang === "ko" ? " " : "";
-  return [`- ${n.shape[th.shape]}`, `- ${FONT_NOTE[lang](fontName)}${sp}${th.emphasized ? n.emphasized : n.plainType}`, `- ${n.motion[th.motion]}`];
+  return [`- ${n.shape[th.shape]}`, `- ${FONT_NOTE[lang](fontName)}${sp}${th.emphasized ? n.emphasized : n.plainType}`, `- ${n.motion[th.motion]}`, `- ${n.entrance[th.entrance]}`];
 }
 
 /** the closing guidance; the lines that depend on the target are written for the chosen platform */
