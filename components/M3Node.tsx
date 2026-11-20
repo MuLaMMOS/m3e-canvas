@@ -228,6 +228,10 @@ const ellipsis = {
 } as const;
 
 const NO_BOX: Kind[] = [
+  "linkButton",
+  "breadcrumb",
+  "pagination",
+  "tagGroup",
   "circularProgress",
   "linearProgress",
   "loadingIndicator",
@@ -890,6 +894,418 @@ function Body({ item, p, tabScroll, menuShown }: { item: Item; p: Palette; tabSc
   if (MEASURED.includes(item.kind)) return <MeasuredContent item={item} p={p} />;
 
   switch (item.kind) {
+    /* ---------- BoardUI's library as canvas parts: one kind, one tile, one drawing ----------
+       Nothing here touches a kind that already existed; each of these is a new branch. */
+
+    case "linkButton":
+      /* an inline action: words only, no container, in the accent colour */
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, height: "100%", padding: "0 8px", color: p.primary }}>
+          {item.icon && <Icon name={item.icon} size={18} color={p.primary} />}
+          <span style={{ fontSize: 14, fontWeight: 600, ...ellipsis }}>{item.label}</span>
+        </div>
+      );
+
+    case "closeButton":
+      return (
+        <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
+          <Icon name={item.icon ?? "close"} size={20} color={p.onSurfaceVariant} />
+        </div>
+      );
+
+    case "breadcrumb": {
+      const parts = item.label.split("/").map((t) => t.trim()).filter(Boolean);
+      return (
+        <div style={{ display: "flex", alignItems: "center", height: "100%", gap: 2 }}>
+          {parts.map((t, i) => (
+            <span key={`${t}-${i}`} style={{ display: "inline-flex", alignItems: "center", gap: 2, minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: i === parts.length - 1 ? 700 : 400,
+                  color: i === parts.length - 1 ? p.onSurface : p.onSurfaceVariant,
+                  ...ellipsis,
+                }}
+              >
+                {t}
+              </span>
+              {i < parts.length - 1 && <Icon name="chevron_right" size={14} color={p.onSurfaceVariant} />}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    case "pagination":
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", gap: 4 }}>
+          <Icon name="chevron_left" size={20} color={p.onSurfaceVariant} />
+          {[1, 2, 3].map((n) => (
+            <div
+              key={n}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                display: "grid",
+                placeItems: "center",
+                fontSize: 13,
+                fontWeight: 600,
+                fontVariantNumeric: "tabular-nums",
+                background: n === 2 ? p.primary : "transparent",
+                color: n === 2 ? p.onPrimary : p.onSurfaceVariant,
+              }}
+            >
+              {n}
+            </div>
+          ))}
+          <Icon name="chevron_right" size={20} color={p.onSurfaceVariant} />
+        </div>
+      );
+
+    case "accordion": {
+      /* header row with its own chevron, a hairline, then the open body */
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 16px", height: 56, flex: "0 0 auto" }}>
+            <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: p.onSurface, ...ellipsis }}>{item.label}</span>
+            <Icon name="expand_less" size={20} color={p.onSurfaceVariant} />
+          </div>
+          <div style={{ height: 1, flex: "0 0 auto", background: p.outlineVariant, margin: "0 16px" }} />
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              padding: "12px 16px",
+              boxSizing: "border-box",
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: p.onSurfaceVariant,
+              overflow: "hidden",
+            }}
+          >
+            {item.supporting}
+          </div>
+        </div>
+      );
+    }
+
+    case "popover": {
+      const rows: { icon: string; label: string }[] = (() => {
+        if (lang === "zh") return [{ icon: "person", label: "个人资料" }, { icon: "settings", label: "设置" }, { icon: "logout", label: "退出登录" }];
+        if (lang === "ko") return [{ icon: "person", label: "프로필" }, { icon: "settings", label: "설정" }, { icon: "logout", label: "로그아웃" }];
+        if (lang === "en") return [{ icon: "person", label: "Profile" }, { icon: "settings", label: "Settings" }, { icon: "logout", label: "Sign out" }];
+        return [{ icon: "person", label: "プロフィール" }, { icon: "settings", label: "設定" }, { icon: "logout", label: "ログアウト" }];
+      })();
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "6px 0", boxSizing: "border-box" }}>
+          {rows.map((r, i) => (
+            <div key={r.icon} style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+              {i === rows.length - 1 && <div style={{ height: 1, background: p.outlineVariant, margin: "0 16px" }} />}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, padding: "0 16px" }}>
+                <Icon name={r.icon} size={20} color={p.onSurfaceVariant} />
+                <span style={{ fontSize: 14, color: p.onSurface, ...ellipsis }}>{r.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    case "tooltip":
+      return (
+        <div style={{ display: "grid", placeItems: "center", height: "100%", padding: "0 12px", boxSizing: "border-box" }}>
+          <span style={{ fontSize: 12, lineHeight: 1.35, color: p.onSurfaceVariant, textAlign: "center" }}>{item.label}</span>
+        </div>
+      );
+
+    case "table": {
+      const head = lang === "zh" ? ["名称", "状态", "数量"] : lang === "ko" ? ["이름", "상태", "수량"] : lang === "en" ? ["Name", "Status", "Qty"] : ["名前", "状態", "数"];
+      const rows = [
+        ["A-104", lang === "en" ? "Active" : lang === "ko" ? "진행 중" : lang === "zh" ? "进行中" : "進行中", "12"],
+        ["B-227", lang === "en" ? "Paused" : lang === "ko" ? "일시정지" : lang === "zh" ? "已暂停" : "一時停止", "8"],
+        ["C-319", lang === "en" ? "Done" : lang === "ko" ? "완료" : lang === "zh" ? "已完成" : "完了", "24"],
+      ];
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "4px 0", boxSizing: "border-box" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 0.6fr", gap: 8, padding: "10px 16px 8px", flex: "0 0 auto" }}>
+            {head.map((h) => (
+              <span key={h} style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.2, color: p.onSurfaceVariant, ...ellipsis }}>
+                {h}
+              </span>
+            ))}
+          </div>
+          <div style={{ height: 1, flex: "0 0 auto", background: p.outlineVariant, margin: "0 16px" }} />
+          {rows.map((r) => (
+            <div
+              key={r[0]}
+              style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 0.6fr", gap: 8, padding: "0 16px", flex: 1, minHeight: 0, alignItems: "center", borderBottom: `1px solid ${p.outlineVariant}` }}
+            >
+              {r.map((cell, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: 12,
+                    color: i === 1 ? p.primary : p.onSurface,
+                    fontWeight: i === 1 ? 600 : 400,
+                    textAlign: i === 2 ? "right" : "left",
+                    fontVariantNumeric: i === 2 ? "tabular-nums" : undefined,
+                    ...ellipsis,
+                  }}
+                >
+                  {cell}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    case "banner":
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%", padding: "0 12px 0 14px", boxSizing: "border-box" }}>
+          {item.icon && <Icon name={item.icon} size={20} color={p.onSecondaryContainer} />}
+          <span style={{ flex: 1, minWidth: 0, fontSize: 13, lineHeight: 1.35, color: p.onSecondaryContainer, overflow: "hidden" }}>{item.label}</span>
+          <Icon name="close" size={18} color={p.onSecondaryContainer} />
+        </div>
+      );
+
+    case "notificationCard":
+      return (
+        <div style={{ display: "flex", gap: 12, height: "100%", padding: "14px 16px", boxSizing: "border-box" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 20, flex: "0 0 auto", display: "grid", placeItems: "center", background: p.secondaryContainer }}>
+            {item.icon && <Icon name={item.icon} size={20} color={p.onSecondaryContainer} />}
+          </div>
+          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: p.onSurface, ...ellipsis }}>{item.label}</span>
+            <span style={{ fontSize: 12, lineHeight: 1.4, color: p.onSurfaceVariant, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+              {item.supporting}
+            </span>
+          </div>
+        </div>
+      );
+
+    case "textarea":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "10px 14px 8px", boxSizing: "border-box", gap: 6 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: p.onSurfaceVariant, ...ellipsis }}>{item.label}</span>
+          <span
+            style={{
+              flex: 1,
+              minHeight: 0,
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: p.onSurface,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {item.supporting}
+          </span>
+          <span style={{ alignSelf: "flex-end", fontSize: 11, color: p.onSurfaceVariant, fontVariantNumeric: "tabular-nums" }}>{"0/120"}</span>
+        </div>
+      );
+
+    case "numberField": {
+      const v = item.value ?? 1;
+      return (
+        <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+          <div style={{ width: 48, height: "100%", display: "grid", placeItems: "center", borderRight: `1px solid ${p.outlineVariant}` }}>
+            <Icon name="remove" size={20} color={v > 0 ? p.onSurfaceVariant : p.outlineVariant} />
+          </div>
+          <span style={{ flex: 1, textAlign: "center", fontSize: 16, fontWeight: 600, color: p.onSurface, fontVariantNumeric: "tabular-nums" }}>{v}</span>
+          <div style={{ width: 48, height: "100%", display: "grid", placeItems: "center", borderLeft: `1px solid ${p.outlineVariant}` }}>
+            <Icon name="add" size={20} color={p.onSurfaceVariant} />
+          </div>
+        </div>
+      );
+    }
+
+    case "segmentedControl": {
+      const opts =
+        lang === "zh" ? ["日", "周", "月"] : lang === "ko" ? ["일", "주", "월"] : lang === "en" ? ["Day", "Week", "Month"] : ["日", "週", "月"];
+      const sel = item.selected ?? 0;
+      return (
+        <div style={{ display: "flex", alignItems: "center", height: "100%", padding: 4, boxSizing: "border-box" }}>
+          {opts.map((o, i) => (
+            <div
+              key={o}
+              style={{
+                flex: 1,
+                height: "100%",
+                display: "grid",
+                placeItems: "center",
+                borderRadius: 14,
+                background: i === sel ? p.primary : "transparent",
+                color: i === sel ? p.onPrimary : p.onSurfaceVariant,
+                fontSize: 12,
+                fontWeight: i === sel ? 700 : 500,
+              }}
+            >
+              {o}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    case "otpField":
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: "100%", padding: "0 12px", boxSizing: "border-box" }}>
+          {["4", "8", "", ""].map((d, i) => (
+            <div
+              key={i}
+              style={{
+                flex: "0 0 auto",
+                width: 40,
+                height: 44,
+                borderRadius: 8,
+                display: "grid",
+                placeItems: "center",
+                fontSize: 16,
+                fontWeight: 600,
+                fontVariantNumeric: "tabular-nums",
+                color: p.onSurface,
+                background: d ? p.surfaceContainerHighest : "transparent",
+                border: d ? "none" : `1px solid ${p.outline}`,
+                boxSizing: "border-box",
+              }}
+            >
+              {d}
+            </div>
+          ))}
+        </div>
+      );
+
+    case "tagGroup":
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, height: "100%", padding: "0 2px", boxSizing: "border-box", overflow: "hidden" }}>
+          {[item.label, item.supporting ?? ""].filter(Boolean).map((t, i) => (
+            <span
+              key={`${t}-${i}`}
+              style={{
+                flex: "0 0 auto",
+                maxWidth: "45%",
+                padding: "5px 12px",
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 600,
+                background: i === 0 && item.checked ? p.secondaryContainer : i === 0 ? p.surfaceContainerHighest : "transparent",
+                color: i === 0 && item.checked ? p.onSecondaryContainer : p.onSurfaceVariant,
+                border: i === 0 && item.checked ? "none" : `1px solid ${p.outlineVariant}`,
+                ...ellipsis,
+              }}
+            >
+              {t}
+            </span>
+          ))}
+          <span style={{ flex: "0 0 auto", display: "grid", placeItems: "center", width: 32, height: 28, borderRadius: 999, border: `1px solid ${p.outlineVariant}` }}>
+            <Icon name="add" size={16} color={p.onSurfaceVariant} />
+          </span>
+        </div>
+      );
+
+    case "socialButton":
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: "100%", padding: "0 14px", boxSizing: "border-box" }}>
+          <span
+            style={{
+              flex: "0 0 auto",
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              display: "grid",
+              placeItems: "center",
+              fontSize: 13,
+              fontWeight: 700,
+              color: p.primary,
+              background: p.surface,
+              border: `1px solid ${p.outlineVariant}`,
+            }}
+          >
+            G
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: p.onSurface, ...ellipsis }}>{item.label}</span>
+        </div>
+      );
+
+    case "checkboxCard":
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%", padding: "0 16px", boxSizing: "border-box" }}>
+          <span
+            style={{
+              flex: "0 0 auto",
+              width: 20,
+              height: 20,
+              borderRadius: 4,
+              display: "grid",
+              placeItems: "center",
+              background: item.checked ? p.primary : "transparent",
+              border: item.checked ? "none" : `1.5px solid ${p.outline}`,
+              boxSizing: "border-box",
+            }}
+          >
+            {item.checked && <Icon name="check" size={14} color={p.onPrimary} />}
+          </span>
+          <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: p.onSurface, ...ellipsis }}>{item.label}</span>
+            <span style={{ fontSize: 12, color: p.onSurfaceVariant, ...ellipsis }}>{item.supporting}</span>
+          </span>
+        </div>
+      );
+
+    case "avatar": {
+      const initials = item.label.trim().slice(0, 2);
+      return (
+        <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
+          {item.icon ? (
+            <Icon name={item.icon} size={28} color={p.onPrimaryContainer} />
+          ) : (
+            <span style={{ fontSize: 19, fontWeight: 700, color: p.onPrimaryContainer, ...ellipsis, maxWidth: "82%" }}>{initials}</span>
+          )}
+        </div>
+      );
+    }
+
+    case "statCard":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, height: "100%", padding: "0 16px", boxSizing: "border-box" }}>
+          <span style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.1, color: p.onSurface, fontVariantNumeric: "tabular-nums", ...ellipsis }}>{item.label}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.2, color: p.onSurfaceVariant, ...ellipsis }}>{item.supporting}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 3, alignSelf: "flex-start", marginTop: 2, padding: "3px 8px", borderRadius: 999, background: p.secondaryContainer, color: p.onSecondaryContainer, fontSize: 11, fontWeight: 700 }}>
+            <Icon name="arrow_upward" size={12} color={p.onSecondaryContainer} />
+            {"8.1%"}
+          </span>
+        </div>
+      );
+
+    case "meter": {
+      const v = Math.max(0, Math.min(100, Math.round(item.value ?? 68)));
+      return (
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8, height: "100%", padding: "0 16px", boxSizing: "border-box" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: p.onSurface, ...ellipsis }}>{item.label}</span>
+            <span style={{ fontSize: 12, color: p.onSurfaceVariant, fontVariantNumeric: "tabular-nums" }}>{`${v}%`}</span>
+          </div>
+          <div style={{ height: 8, borderRadius: 4, background: p.surfaceContainerHighest, overflow: "hidden" }}>
+            <div style={{ width: `${v}%`, height: "100%", borderRadius: 4, background: p.primary }} />
+          </div>
+        </div>
+      );
+    }
+
+    case "skeleton":
+      return (
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8, height: "100%", padding: "0 16px", boxSizing: "border-box" }}>
+          {["86%", "62%", "40%"].map((w) => (
+            <span key={w} style={{ width: w, height: 12, borderRadius: 6, background: p.surfaceContainerHighest }} />
+          ))}
+        </div>
+      );
+
     case "bottomSheet":
       return (
         <div style={{ display: "flex", justifyContent: "center", paddingTop: 16 }}>
@@ -1792,6 +2208,24 @@ export function boxStyle(item: Item, p: Palette): React.CSSProperties {
       const t = item.fill ?? "surfaceContainerLow";
       return { background: p[t], border: "none", color: onToken(t, p) };
     }
+    case "accordion":
+    case "table":
+    case "statCard":
+    case "notificationCard":
+    case "checkboxCard":
+    case "skeleton":
+      return { background: p.surfaceContainerLow, border: "none", color: p.onSurface };
+    case "banner":
+      return { background: p.secondaryContainer, border: "none", color: p.onSecondaryContainer };
+    case "avatar":
+      return { background: p.primaryContainer, border: "none", color: p.onPrimaryContainer };
+    case "socialButton":
+    case "textarea":
+    case "numberField":
+    case "otpField":
+      return { background: p.surface, border: `1px solid ${p.outlineVariant}`, color: p.onSurface };
+    case "segmentedControl":
+      return { background: p.surfaceContainerHighest, border: "none", color: p.onSurface };
     default:
       return { background: p.surfaceContainerHigh, border: "none", color: p.onSurface };
   }
@@ -1818,6 +2252,9 @@ function shadowOf(item: Item): string {
       return dateLayoutOf(item) === "input" ? "none" : "0 8px 24px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10)";
     case "snackbar":
       return "0 3px 8px rgba(0,0,0,0.18)";
+    case "popover":
+    case "tooltip":
+      return "0 6px 18px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.10)";
     case "toolbar":
       return "0 2px 6px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.10)";
     default:

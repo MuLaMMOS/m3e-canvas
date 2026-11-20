@@ -396,6 +396,31 @@ function itemJa(it: Item): string {
     }
     case "radio":
       return `${q(it.label)}のラジオボタン（初期状態は${it.checked ? "選択" : "未選択"}）`;
+    case "linkButton":
+    case "closeButton":
+    case "breadcrumb":
+    case "pagination":
+    case "accordion":
+    case "popover":
+    case "tooltip":
+    case "table":
+    case "banner":
+    case "notificationCard":
+    case "textarea":
+    case "segmentedControl":
+    case "otpField":
+    case "tagGroup":
+    case "socialButton":
+    case "checkboxCard":
+    case "avatar":
+    case "skeleton":
+      return `${hasText(it.label) ? q(it.label) : "ラベルなし"}の${noun}${hasText(it.supporting ?? "") ? `（${q(it.supporting ?? "")}）` : ""}`;
+    case "numberField":
+      return `${noun}（現在値 ${it.value ?? 1}、左右に増減ボタン）`;
+    case "meter":
+      return `${q(it.label)}の${noun}（${it.value ?? 68}% まで満ちる）`;
+    case "statCard":
+      return `${q(it.label)}を大きく示す${noun}${hasText(it.supporting ?? "") ? `（${q(it.supporting ?? "")}）` : ""}に増加率チップ`;
     default:
       return noun;
   }
@@ -495,6 +520,31 @@ function itemEn(it: Item): string {
     }
     case "radio":
       return `a radio button ${q(it.label)} (initially ${it.checked ? "selected" : "unselected"})`;
+    case "linkButton":
+    case "closeButton":
+    case "breadcrumb":
+    case "pagination":
+    case "accordion":
+    case "popover":
+    case "tooltip":
+    case "table":
+    case "banner":
+    case "notificationCard":
+    case "textarea":
+    case "segmentedControl":
+    case "otpField":
+    case "tagGroup":
+    case "socialButton":
+    case "checkboxCard":
+    case "avatar":
+    case "skeleton":
+      return `${hasText(it.label) ? q(it.label) : ""} ${noun}${hasText(it.supporting ?? "") ? ` (${q(it.supporting ?? "")})` : ""}`.trim();
+    case "numberField":
+      return `${noun} showing ${it.value ?? 1}, with minus and plus steppers`;
+    case "meter":
+      return `${noun} for ${q(it.label)} filled to ${it.value ?? 68}%`;
+    case "statCard":
+      return `${noun} with ${q(it.label)} as the headline${hasText(it.supporting ?? "") ? `, labelled ${q(it.supporting ?? "")}` : ""}, and a delta chip`;
     default:
       return noun;
   }
@@ -594,6 +644,31 @@ function itemZh(it: Item): string {
     }
     case "radio":
       return `${q(it.label)}单选按钮（初始状态为${it.checked ? "选中" : "未选中"}）`;
+    case "linkButton":
+    case "closeButton":
+    case "breadcrumb":
+    case "pagination":
+    case "accordion":
+    case "popover":
+    case "tooltip":
+    case "table":
+    case "banner":
+    case "notificationCard":
+    case "textarea":
+    case "segmentedControl":
+    case "otpField":
+    case "tagGroup":
+    case "socialButton":
+    case "checkboxCard":
+    case "avatar":
+    case "skeleton":
+      return `${hasText(it.label) ? q(it.label) : ""}的${noun}${hasText(it.supporting ?? "") ? `（${q(it.supporting ?? "")}）` : ""}`;
+    case "numberField":
+      return `${noun}（当前值 ${it.value ?? 1}，左右各一个增减按钮）`;
+    case "meter":
+      return `${q(it.label)}的${noun}（已到 ${it.value ?? 68}%）`;
+    case "statCard":
+      return `以 ${q(it.label)} 为大数字的${noun}${hasText(it.supporting ?? "") ? `（${q(it.supporting ?? "")}）` : ""}，带涨幅小标签`;
     default:
       return noun;
   }
@@ -663,6 +738,31 @@ function itemKo(it: Item): string {
       return `${labels.join(", ")}의 탭 ${labels.length}개(${selectedText(it, "ko")}${isScrollableTabs(it) ? ", 가로로 스크롤되는 탭" : ""})`;
     }
     case "radio": return `${q(it.label)} 라디오 버튼(초기 상태 ${it.checked ? "선택됨" : "선택 안 됨"})`;
+    case "linkButton":
+    case "closeButton":
+    case "breadcrumb":
+    case "pagination":
+    case "accordion":
+    case "popover":
+    case "tooltip":
+    case "table":
+    case "banner":
+    case "notificationCard":
+    case "textarea":
+    case "segmentedControl":
+    case "otpField":
+    case "tagGroup":
+    case "socialButton":
+    case "checkboxCard":
+    case "avatar":
+    case "skeleton":
+      return `${hasText(it.label) ? q(it.label) : ""} ${noun}${hasText(it.supporting ?? "") ? ` (${q(it.supporting ?? "")})` : ""}`.trim();
+    case "numberField":
+      return `${noun}(현재 값 ${it.value ?? 1}, 좌우 증감 버튼)`;
+    case "meter":
+      return `${q(it.label)} ${noun}(${it.value ?? 68}%까지 채워짐)`;
+    case "statCard":
+      return `${q(it.label)}를 큰 숫자로 보여 주는 ${noun}${hasText(it.supporting ?? "") ? `(${q(it.supporting ?? "")})` : ""}, 증가율 칩 포함`;
     default: return noun;
   }
 }
