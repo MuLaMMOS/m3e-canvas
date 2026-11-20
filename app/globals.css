@@ -28,8 +28,11 @@ body {
     transform: scale(0.95);
   }
   to {
+    /* a hair of blur instead of zero: the minifier turns blur(0) / blur(0px) / filter: none into
+       an endpoint the browser refuses to interpolate, which snaps the focus back instead of
+       sharpening into it. 0.001px is invisible and survives minification. */
     opacity: 1;
-    filter: blur(0);
+    filter: blur(0.001px);
     transform: scale(1);
   }
 }
