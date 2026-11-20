@@ -429,9 +429,9 @@ export const UI = {
   motionStandard: { ja: "スタンダード", en: "Standard", zh: "标准" },
   motionExpressive: { ja: "エクスプレッシブ", en: "Expressive", zh: "富有表现力" },
   motionHint: {
-    ja: "エクスプレッシブは弾むスプリング。プレビューの画面遷移とプロンプトに反映されます。",
-    en: "Expressive is a bouncy spring. It drives the preview transitions and the prompt.",
-    zh: "富有表现力为弹性弹簧动效，作用于预览的屏幕过渡和提示词。",
+    ja: "エクスプレッシブは弾むスプリング。要素はより大きくぼけて凝縮しながら登場し、プレビューの画面遷移とプロンプトにも反映されます。",
+    en: "Expressive is a bouncy spring, and parts condense in from further out. It drives the preview transitions and the prompt.",
+    zh: "富有表现力为弹性弹簧动效，组件会以更大幅度模糊凝聚入场；同时作用于预览过渡和提示词。",
   },
   tryIt: { ja: "タップして確認", en: "Tap to try", zh: "点击试试" },
   // tidy
@@ -558,7 +558,7 @@ export const KO: Record<UIKey, string> = {
   linkBrowser: "브라우저", shapeScale: "모서리 둥글기", shapeSquare: "사각형", shapeRounded: "둥근형", shapeFull: "완전 둥근형",
   shapeHint: "모든 부품의 기본 모서리를 한 번에 바꿉니다. 부품에 직접 입력한 반경은 유지됩니다.", fontFamily: "글꼴", emphasized: "강조 스타일",
   emphasizedHint: "제목과 레이블에 더 굵은 M3 Expressive 스타일을 사용합니다.", motionScheme: "모션 방식", motionStandard: "표준", motionExpressive: "익스프레시브",
-  motionHint: "익스프레시브는 통통 튀는 스프링 효과입니다. 미리보기 화면 전환과 프롬프트에 반영됩니다.", tryIt: "탭하여 확인",
+  motionHint: "익스프레시브는 통통 튀는 스프링이며, 요소가 더 크게 흐려졌다가 응축되어 등장합니다. 미리보기 화면 전환과 프롬프트에 반영됩니다.", tryIt: "탭하여 확인",
   tidy: "정리", tidyUndo: "정리 실행 취소", tidyDone: "이미 정돈되어 있습니다", placement: "본문의 세로 배치", placeTop: "위에서부터", placeCenter: "가운데", placeBottom: "아래쪽", placeSpread: "균등", align: "정렬", alignLeft: "왼쪽 정렬", alignCenterH: "가로 가운데 정렬", alignRight: "오른쪽 정렬", alignTop: "위쪽 정렬", alignCenterV: "세로 가운데 정렬", alignBottom: "아래쪽 정렬", description: "설명", screenDescription: "이 화면의 용도",
   ai: "AI", promptReset: "생성된 프롬프트로 되돌리기", aiWriteShort: "AI로 작성", aiWrite: "AI에게 작성 맡기기", aiSettings: "AI 설정",
   aiProvider: "제공업체", aiBaseUrl: "기본 URL", aiModel: "모델 ID", aiKey: "API 키", aiGetKey: "키 받기",

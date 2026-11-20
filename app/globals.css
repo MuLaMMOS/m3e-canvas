@@ -24,8 +24,8 @@ body {
 @keyframes m3e-soft-in {
   from {
     opacity: 0;
-    filter: blur(2px);
-    transform: scale(0.95);
+    filter: blur(var(--m3e-in-blur, 2px));
+    transform: scale(var(--m3e-in-scale, 0.95));
   }
   to {
     /* a hair of blur instead of zero: the minifier turns blur(0) / blur(0px) / filter: none into

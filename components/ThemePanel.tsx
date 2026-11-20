@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { FONTS, Palette, SHAPES, ShapeScale, Theme } from "@/lib/tokens";
+import { FONTS, Palette, SHAPES, ShapeScale, Theme, entranceCssVars } from "@/lib/tokens";
 import { ensureFontLoaded } from "@/lib/theme";
 import { Lang, t, useLang } from "@/lib/i18n";
 import { Icon } from "./M3Node";
@@ -158,9 +158,6 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
   const lang = useLang();
   const [tick, setTick] = useState(0);
   const expressive = theme.motion === "expressive";
-  const transition = expressive
-    ? { type: "spring" as const, stiffness: 380, damping: 18, mass: 1 }
-    : { duration: 0.35, ease: [0.2, 0, 0, 1] as const };
   return (
     <div className="no-scrollbar" style={{ height: "100%", overflowY: "auto", padding: "12px 12px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: p.onSurfaceVariant, padding: "0 4px" }}>{t("motionScheme", lang)}</div>
@@ -198,10 +195,11 @@ export function MotionPanel({ p, theme, onChange }: { p: Palette; theme: Theme; 
       >
         <motion.span
           key={`${theme.motion}:${tick}`}
-          initial={{ x: -110, scale: 0.8, rotate: -20 }}
-          animate={{ x: 0, scale: 1, rotate: 0 }}
-          transition={transition}
+          initial={false}
           style={{
+            /* the same BoardUI blur-in the canvas parts arrive with, replayed on demand */
+            ...entranceCssVars(theme.motion),
+            animation: "m3e-soft-in var(--m3e-in-dur, 150ms) cubic-bezier(0.22, 1, 0.36, 1)",
             width: 48,
             height: 48,
             borderRadius: expressive ? 14 : 24,

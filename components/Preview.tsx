@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Item, Kind } from "@/lib/tokens";
-import { RIPPLE_KINDS } from "@/lib/tokens";
+import { RIPPLE_KINDS, entranceCssVars } from "@/lib/tokens";
 import { AnimatePresence, animate, motion, useMotionValue, useTransform, useReducedMotion, useIsPresent } from "motion/react";
 import type { TargetAndTransition, Variants } from "motion/react";
 import {
@@ -1484,6 +1484,7 @@ export function Preview({
               overflow: "hidden",
               background: p[current.bg ?? "surface"],
               fontFamily: fontFamilyOf(theme.font, lang),
+              ...entranceCssVars(theme.motion),
               touchAction: "none",
             }}
           >

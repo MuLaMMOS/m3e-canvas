@@ -127,6 +127,17 @@ export const PULL_EXP = 2.2;
 export const SETTLE_MS = 340;
 /** the same time and curve, as the CSS custom properties the stylesheet eases with */
 export const SETTLE_CSS_VARS = { "--m3-settle": `${SETTLE_MS}ms`, "--m3-ease": "cubic-bezier(0.2, 0, 0, 1)" } as const;
+/** how far the BoardUI blur-in compresses before a part lands: the standard scheme is the
+ *  reference 150ms / scale .95 / 2px blur, the expressive one travels further and lingers a
+ *  little, so switching the scheme in the motion panel is visible on the canvas, not only in
+ *  the prompt. Written as custom properties so one place sets it and the stylesheet reads it. */
+export function entranceCssVars(motion: MotionScheme) {
+  return (
+    motion === "expressive"
+      ? { "--m3e-in-dur": "320ms", "--m3e-in-blur": "4px", "--m3e-in-scale": "0.86" }
+      : { "--m3e-in-dur": "150ms", "--m3e-in-blur": "2px", "--m3e-in-scale": "0.95" }
+  ) as CSSProperties;
+}
 /** the size handles stand above everything on the canvas but the panels */
 export const SIZE_HANDLE_Z = 55;
 

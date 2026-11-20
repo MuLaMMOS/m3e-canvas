@@ -94,6 +94,7 @@ import {
   PHONE_W,
   PULL_EXP,
   Radii,
+  entranceCssVars,
   SETTLE_CSS_VARS,
   SETTLE_MS,
   sizeOf,
@@ -3891,6 +3892,8 @@ export default function Editor({ initialLang, onReady }: { initialLang: Lang; on
         style={{
           /* the settle time and curve the stylesheet eases with, from the one place they are set */
           ...(SETTLE_CSS_VARS as React.CSSProperties),
+          /* the entrance the parts condense in with, chosen by the motion scheme in the panel */
+          ...entranceCssVars(theme.motion),
           display: "flex",
           overflow: "hidden",
           background: p.surfaceContainer,
